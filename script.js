@@ -1,37 +1,83 @@
 const foods = [
-  { name: "کباب کوبیده", category: "غذای اصلی", image: "https://via.placeholder.com/90", price: 180000, available: true },
-  { name: "سوپ جو", category: "پیش‌غذا", image: "https://via.placeholder.com/90", price: 60000, available: true },
-  { name: "آب پرتقال", category: "نوشیدنی", image: "https://via.placeholder.com/90", price: 30000, available: false }
+  {
+    name: "چلوکباب سلطانی",
+    category: "غذای اصلی",
+    ingredients: ["برنج ایرانی", "کباب کوبیده", "کباب برگ"],
+    image: "https://via.placeholder.com/90",
+    price: 250000,
+    discount: 0.1,
+    available: true,
+    time: "all"
+  },
+  {
+    name: "سوپ قارچ",
+    category: "پیش‌غذا",
+    ingredients: ["قارچ", "خامه", "شیر", "جو"],
+    image: "https://via.placeholder.com/90",
+    price: 60000,
+    discount: 0,
+    available: true,
+    time: "18"
+  },
+  {
+    name: "نوشابه قوطی",
+    category: "نوشیدنی",
+    ingredients: ["نوشابه گازدار", "قند"],
+    image: "https://via.placeholder.com/90",
+    price: 20000,
+    discount: 0,
+    available: false,
+    time: "all"
+  }
 ];
 
-let cart = [];
+let cart = {};
 
 function renderMenu(filter = "همه") {
   const container = document.getElementById("food-list");
   container.innerHTML = "";
+  const hour = new Date().getHours();
 
   foods
-    .filter(food => filter === "همه" || food.category === filter)
+    .filter(f => (filter === "همه" || f.category === filter) && 
+                 (f.time === "all" || Number(f.time) <= hour))
     .forEach(food => {
-      const item = document.createElement("div");
-      item.className = "food-item" + (food.available ? "" : " unavailable");
-      item.innerHTML = `
+      const finalPrice = food.price * (1 - food.discount);
+      const div = document.createElement("div");
+      div.className = "food-item" + (food.available ? "" : " unavailable");
+
+      div.innerHTML = `
         <img src="${food.image}" alt="${food.name}">
         <div class="food-info">
           <h3>${food.name}</h3>
-          <p>${food.category}</p>
-          <p><strong>${food.price.toLocaleString()} تومان</strong></p>
+          <p>${food.ingredients.join("، ")}</p>
+          <p>قیمت: 
+            ${food.discount > 0 
+              ? `<del>${food.price.toLocaleString()}</del> → <strong>${finalPrice.toLocaleString()}</strong> تومان`
+              : `<strong>${food.price.toLocaleString()}</strong> تومان`}
+          </p>
         </div>
-        ${food.available ? `<button class="add-btn" onclick="addToCart('${food.name}')">افزودن</button>` : "<p>ناموجود</p>"}
+        ${food.available ? `
+          <button class="add-btn" onclick="addToCart('${food.name}')">+</button>
+          <button class="remove-btn" onclick="removeFromCart('${food.name}')">−</button>
+        ` : `<p>ناموجود</p>`}
       `;
-      container.appendChild(item);
+      container.appendChild(div);
     });
 }
 
 function addToCart(name) {
-  const food = foods.find(f => f.name === name);
-  cart.push(food);
+  if (!cart[name]) cart[name] = 0;
+  cart[name]++;
   updateCart();
+}
+
+function removeFromCart(name) {
+  if (cart[name]) {
+    cart[name]--;
+    if (cart[name] === 0) delete cart[name];
+    updateCart();
+  }
 }
 
 function updateCart() {
@@ -40,24 +86,32 @@ function updateCart() {
   cartList.innerHTML = "";
   let total = 0;
 
-  cart.forEach(item => {
+  for (let name in cart) {
+    const item = foods.find(f => f.name === name);
+    const price = item.price * (1 - item.discount);
+    const quantity = cart[name];
     const li = document.createElement("li");
-    li.textContent = item.name + " - " + item.price.toLocaleString() + " تومان";
+    li.textContent = `${item.name} × ${quantity} = ${(price * quantity).toLocaleString()} تومان`;
     cartList.appendChild(li);
-    total += item.price;
-  });
+    total += price * quantity;
+  }
 
   totalPrice.textContent = total.toLocaleString();
 }
 
 function checkout() {
-  alert("پرداخت انجام شد. سفارش ثبت گردید.");
-  cart = [];
+  alert("✅ سفارش شما ثبت شد!");
+  cart = {};
   updateCart();
 }
 
 function callWaiter() {
-  alert("گارسون فراخوانی شد.");
+  alert("📣 گارسون در راه است!");
+}
+
+function sendMessageToWaiter() {
+  const msg = prompt("پیام خود را وارد کنید:");
+  if (msg) alert(`📨 پیام ارسال شد: ${msg}`);
 }
 
 function filterCategory(cat) {
