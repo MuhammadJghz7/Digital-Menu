@@ -2,25 +2,31 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>منوی دیجیتال</title>
+  <title>منوی دیجیتال پیشرفته</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <aside class="sidebar">
       <h2>دسته‌بندی</h2>
-      <ul>
-        <li>غذای اصلی</li>
-        <li>پیش‌غذا</li>
-        <li>نوشیدنی</li>
-        <li>دسر</li>
+      <ul id="category-list">
+        <li onclick="filterCategory('همه')">همه</li>
+        <li onclick="filterCategory('غذای اصلی')">غذای اصلی</li>
+        <li onclick="filterCategory('پیش‌غذا')">پیش‌غذا</li>
+        <li onclick="filterCategory('نوشیدنی')">نوشیدنی</li>
       </ul>
-      <button onclick="callWaiter()">فراخوانی گارسون</button>
+      <button onclick="callWaiter()">📣 فراخوانی گارسون</button>
     </aside>
 
     <main class="menu">
-      <h1>منوی دیجیتال</h1>
+      <h1>🍽️ منوی دیجیتال رستوران</h1>
       <div id="food-list" class="food-list"></div>
+      <div id="cart" class="cart">
+        <h3>🛒 سبد خرید</h3>
+        <ul id="cart-items"></ul>
+        <p><strong>مجموع:</strong> <span id="total-price">۰</span> تومان</p>
+        <button onclick="checkout()">پرداخت</button>
+      </div>
     </main>
   </div>
 
