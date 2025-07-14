@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>پنل مدیریت غذا</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" style="flex-direction: column; padding: 30px;">
+    <h2>🍳 پنل مدیریت منوی غذا</h2>
+
+    <form id="food-form">
+      <input type="text" placeholder="نام غذا" id="name" required>
+      <input type="text" placeholder="دسته‌بندی (مثلاً نوشیدنی)" id="category" required>
+      <input type="text" placeholder="ترکیبات (با , جدا کنید)" id="ingredients" required>
+      <input type="text" placeholder="لینک عکس" id="image">
+      <input type="number" placeholder="قیمت (تومان)" id="price" required>
+      <input type="number" placeholder="درصد تخفیف (مثلاً 0.1)" id="discount" step="0.01">
+      <input type="text" placeholder="ساعت مجاز (مثل 18 یا all)" id="time">
+      <label><input type="checkbox" id="available"> موجود است</label>
+      <button type="submit">ذخیره غذا</button>
+    </form>
+
+    <h3>لیست غذاها</h3>
+    <ul id="food-list"></ul>
+  </div>
+
+  <script>
+    let foods = JSON.parse(localStorage.getItem("foods")) || [];
+
+    const form = document.getElementById("food-form");
+    const list = document.getElementById("food-list");
+
+    function render() {
+      list.innerHTML = "";
+      foods.forEach((f, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${f.name}</strong> - ${f.category} - ${f.price} تومان
+          [${f.available ? "✅ موجود" : "❌ ناموجود"}]
+          <button onclick="editFood(${index})">✏ ویرایش</button>
+          <button onclick="deleteFood(${index})">🗑 حذف</button>
+        `;
+        list.appendChild(li);
+      });
+      localStorage.setItem("foods", JSON.stringify(foods));
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      const newFood = {
+        name: form.name.value,
+        category: form.category.value,
+        ingredients: form.ingredients.value.split(','),
+        image: form.image.value || "https://via.placeholder.com/90",
+        price: parseInt(form.price.value),
+        discount: parseFloat(form.discount.value) || 0,
+        time: form.time.value || "all",
+        available: form.available.checked
+      };
+      if (form.dataset.editing) {
+        foods[form.dataset.editing] = newFood;
+        delete form.dataset.editing;
+      } else {
+        foods.push(newFood);
+      }
+      form.reset();
+      render();
+    };
+
+    function editFood(index) {
+      const f = foods[index];
+      form.name.value = f.name;
+      form.category.value = f.category;
+      form.ingredients.value = f.ingredients.join(',');
+      form.image.value = f.image;
+      form.price.value = f.price;
+      form.discount.value = f.discount;
+      form.time.value = f.time;
+      form.available.checked = f.available;
+      form.dataset.editing = index;
+    }
+
+    function deleteFood(index) {
+      if (confirm("آیا حذف شود؟")) {
+        foods.splice(index, 1);
+        render();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
