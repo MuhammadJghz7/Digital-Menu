@@ -2,13 +2,13 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>منوی دیجیتال پیشرفته</title>
+  <title>منوی دیجیتال رستوران</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <aside class="sidebar">
-      <h2>دسته‌بندی</h2>
+      <h2>🍽️ دسته‌بندی</h2>
       <ul id="category-list">
         <li onclick="filterCategory('همه')">همه</li>
         <li onclick="filterCategory('غذای اصلی')">غذای اصلی</li>
@@ -16,11 +16,13 @@
         <li onclick="filterCategory('نوشیدنی')">نوشیدنی</li>
       </ul>
       <button onclick="callWaiter()">📣 فراخوانی گارسون</button>
+      <button onclick="sendMessageToWaiter()">📩 ارسال پیام</button>
     </aside>
 
     <main class="menu">
-      <h1>🍽️ منوی دیجیتال رستوران</h1>
+      <h1>منوی دیجیتال</h1>
       <div id="food-list" class="food-list"></div>
+
       <div id="cart" class="cart">
         <h3>🛒 سبد خرید</h3>
         <ul id="cart-items"></ul>
