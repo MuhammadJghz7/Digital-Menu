@@ -1,35 +1,5 @@
-const foods = [
-  {
-    name: "چلوکباب سلطانی",
-    category: "غذای اصلی",
-    ingredients: ["برنج ایرانی", "کباب کوبیده", "کباب برگ"],
-    image: "https://via.placeholder.com/90",
-    price: 250000,
-    discount: 0.1,
-    available: true,
-    time: "all"
-  },
-  {
-    name: "سوپ قارچ",
-    category: "پیش‌غذا",
-    ingredients: ["قارچ", "خامه", "شیر", "جو"],
-    image: "https://via.placeholder.com/90",
-    price: 60000,
-    discount: 0,
-    available: true,
-    time: "18"
-  },
-  {
-    name: "نوشابه قوطی",
-    category: "نوشیدنی",
-    ingredients: ["نوشابه گازدار", "قند"],
-    image: "https://via.placeholder.com/90",
-    price: 20000,
-    discount: 0,
-    available: false,
-    time: "all"
-  }
-];
+// دریافت داده‌ها از localStorage
+let foods = JSON.parse(localStorage.getItem("foods")) || [];
 
 let cart = {};
 
@@ -38,9 +8,16 @@ function renderMenu(filter = "همه") {
   container.innerHTML = "";
   const hour = new Date().getHours();
 
+  if (foods.length === 0) {
+    container.innerHTML = "<p>هیچ غذایی ثبت نشده است.</p>";
+    return;
+  }
+
   foods
-    .filter(f => (filter === "همه" || f.category === filter) && 
-                 (f.time === "all" || Number(f.time) <= hour))
+    .filter(f =>
+      (filter === "همه" || f.category === filter) &&
+      (f.time === "all" || Number(f.time) <= hour)
+    )
     .forEach(food => {
       const finalPrice = food.price * (1 - food.discount);
       const div = document.createElement("div");
@@ -88,6 +65,7 @@ function updateCart() {
 
   for (let name in cart) {
     const item = foods.find(f => f.name === name);
+    if (!item) continue; // اگر غذا حذف شده
     const price = item.price * (1 - item.discount);
     const quantity = cart[name];
     const li = document.createElement("li");
@@ -100,7 +78,11 @@ function updateCart() {
 }
 
 function checkout() {
-  alert("✅ سفارش شما ثبت شد!");
+  if (Object.keys(cart).length === 0) {
+    alert("🛒 سبد خرید شما خالی است.");
+    return;
+  }
+  alert("✅ سفارش شما ثبت شد. با تشکر!");
   cart = {};
   updateCart();
 }
