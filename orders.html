@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>پیگیری سفارشات زنده</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .order-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      background: #fdfdfd;
+    }
+    .order-box h3 { margin: 5px 0; }
+    .status-btn { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width: 700px;">
+    <h2>📦 سفارشات در حال پیگیری</h2>
+    <div id="orders-container"></div>
+  </div>
+
+  <script>
+    const ordersContainer = document.getElementById("orders-container");
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    const statuses = ["در انتظار", "در حال آماده‌سازی", "تحویل‌شده"];
+
+    function renderOrders() {
+      ordersContainer.innerHTML = "";
+      orders.forEach((order, index) => {
+        const box = document.createElement("div");
+        box.className = "order-box";
+
+        let items = order.items.map(item => `🍽 ${item.name} × ${item.count}`).join("<br>");
+
+        box.innerHTML = `
+          <h3>🧾 سفارش #${index + 1}</h3>
+          <p><strong>مشتری:</strong> ${order.customer || "ناشناس"}</p>
+          <p><strong>غذاها:</strong><br>${items}</p>
+          <p><strong>مبلغ:</strong> ${order.total} تومان</p>
+          <p><strong>وضعیت:</strong> ${order.status}</p>
+          <button class="status-btn" onclick="nextStatus(${index})">📤 تغییر وضعیت</button>
+        `;
+        ordersContainer.appendChild(box);
+      });
+    }
+
+    function nextStatus(index) {
+      let current = orders[index].status || statuses[0];
+      let nextIndex = (statuses.indexOf(current) + 1) % statuses.length;
+      orders[index].status = statuses[nextIndex];
+      localStorage.setItem("orders", JSON.stringify(orders));
+      renderOrders();
+    }
+
+    renderOrders();
+  </script>
+</body>
+</html>
